@@ -1,4 +1,4 @@
-import SwiftUI
+import SwiftUIzz
 import PhotosUI
 
 struct AddMemory: View {
