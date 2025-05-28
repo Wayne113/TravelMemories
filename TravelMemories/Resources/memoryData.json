@@ -1,0 +1,137 @@
+[
+    {
+        "name": "Tanjung Aru Beach",
+        "category": "Beach & Island",
+        "city": "Kota Kinabalu",
+        "state": "Sabah",
+        "id": 1001,
+        "isFeatured": true,
+        "isFavorite": true,
+        "coordinates": {
+            "longitude": 116.0581,
+            "latitude": 5.9471
+        },
+        "description": "Tanjung Aru Beach is a popular beach in Kota Kinabalu, Sabah, Malaysia. Known for its stunning sunsets, this beach offers a perfect blend of natural beauty and recreational facilities. The beach features a long stretch of golden sand, clear waters, and a beautiful promenade. Visitors can enjoy various activities such as swimming, beach volleyball, and water sports. The nearby Tanjung Aru Beach Park provides amenities including restaurants, cafes, and picnic areas. The beach is particularly famous for its spectacular sunset views, making it a favorite spot for both locals and tourists.",
+        "imageName": "tanjungaru"
+    },
+    {
+        "name": "Mount Kinabalu",
+        "category": "Hiking",
+        "city": "Ranau",
+        "state": "Sabah",
+        "id": 1002,
+        "isFeatured": true,
+        "isFavorite": true,
+        "coordinates": {
+            "longitude": 116.5581,
+            "latitude": 6.0750
+        },
+        "description": "Mount Kinabalu (4,095m) is Southeast Asia's tallest mountain, located in Kinabalu Park, Sabah, Malaysia. This UNESCO World Heritage Site boasts unparalleled biodiversity (including rare orchids and the giant Rafflesia flower) and is sacred to the Kadazan-Dusun people. The challenging 2-day summit trek rewards climbers with surreal sunrise views from its granite peak. The nearest gateway is Kota Kinabalu (~2 hours away), with the mountain town Kundasang serving as the base for expeditions. A must-visit for adventurers and nature lovers alike!",
+        "imageName": "mountkinabalu"
+    },
+    {
+        "name": "Mount Emei",
+        "category": "Hiking",
+        "city": "Emeishan",
+        "state": "Sichuan",
+        "id": 1003,
+        "isFeatured": false,
+        "isFavorite": false,
+        "coordinates": {
+            "longitude": 103.3367,
+            "latitude": 29.5216
+        },
+        "description": "Mount Emei, or Emeishan, is one of China's Four Sacred Buddhist Mountains, located in Sichuan Province. Renowned for its stunning natural beauty, ancient temples, and rich cultural heritage, it attracts pilgrims and hikers alike. The mountain is covered with lush forests, diverse wildlife, and offers breathtaking views, especially at sunrise above the sea of clouds. It's also a UNESCO World Heritage site, celebrated for its spiritual significance and serene landscapes.",
+        "imageName": "emeishan"
+    },
+    {
+        "name": "Sematan Beach",
+        "category": "Beach & Island",
+        "city": "Lundu",
+        "state": "Sarawak",
+        "id": 1004,
+        "isFeatured": true,
+        "isFavorite": false,
+        "coordinates": {
+            "longitude": 109.7667,
+            "latitude": 1.8167
+        },
+        "description": "Sematan Beach is a hidden gem located in Lundu, Sarawak, Malaysia. This pristine beach is known for its untouched natural beauty, clear waters, and peaceful atmosphere. The beach offers a perfect escape from city life, with its long stretch of white sand and gentle waves. Visitors can enjoy swimming, beachcombing, and watching spectacular sunsets. The surrounding area is rich in biodiversity, with nearby mangrove forests and fishing villages. Sematan Beach is particularly popular among locals for weekend getaways and is becoming increasingly known among tourists seeking unspoiled coastal beauty.",
+        "imageName": "sematanbeach"
+    },
+    {
+        "name": "Penang Hill",
+        "category": "Hiking",
+        "city": "George Town",
+        "state": "Penang",
+        "id": 1005,
+        "isFeatured": false,
+        "isFavorite": false,
+        "coordinates": {
+            "longitude": 100.2651,
+            "latitude": 5.3971
+        },
+        "description": "Penang Hill, located near George Town in Malaysia, is a popular getaway known for its cool climate and stunning panoramic views of the island. The hill is covered in lush tropical rainforest and offers a peaceful escape from the city's heat and hustle. Visitors can hike scenic trails or take a funicular railway to the summit, where colonial-era bungalows, cafes, and lookout points await. The area is rich in biodiversity and provides a refreshing experience for nature lovers, hikers, and those seeking a tranquil retreat. Penang Hill is also culturally significant, with temples and heritage sites adding to its charm.",
+        "imageName": "penanghill"
+    },
+    {
+        "name": "Pangkor Island",
+        "category": "Beach & Island",
+        "city": "Lumut",
+        "state": "Perak",
+        "id": 1006,
+        "isFeatured": false,
+        "isFavorite": false,
+        "coordinates": {
+            "longitude": 100.5581,
+            "latitude": 4.2271
+        },
+        "description": "Pangkor Island is a beautiful island off the coast of Perak, Malaysia, accessible from Lumut. Known for its pristine beaches, crystal-clear waters, and laid-back atmosphere, it's a perfect destination for those seeking a peaceful beach getaway. The island features several stunning beaches, including Nipah Bay and Coral Bay, known for their white sand and excellent snorkeling spots. Visitors can enjoy various activities such as island hopping, fishing, and exploring the local fishing villages. The island is also home to the historic Dutch Fort and offers a mix of luxury resorts and budget accommodations. Pangkor Island is particularly famous for its fresh seafood and traditional fishing village culture.",
+        "imageName": "pangkorisland"
+    },
+    {
+        "name": "Chengdu",
+        "category": "Travel",
+        "city": "Sichuan",
+        "state": "China",
+        "id": 1007,
+        "isFeatured": true,
+        "isFavorite": false,
+        "coordinates": {
+            "longitude": 104.06333,
+            "latitude": 30.66000
+        },
+        "description": "Chengdu, the capital of Sichuan Province, is a vibrant metropolis known for its laid-back lifestyle and spicy cuisine. The city is famous for its giant panda research base, where visitors can observe these adorable creatures in their natural habitat. Chengdu's rich cultural heritage is evident in its ancient temples, traditional tea houses, and the famous Jinli Ancient Street. The city is also renowned for its Sichuan cuisine, particularly hot pot and mapo tofu. With its perfect blend of modern development and traditional charm, Chengdu offers visitors a unique experience of contemporary Chinese culture.",
+        "imageName": "chengdu"
+    },
+    {
+        "name": "Hat Yai",
+        "category": "Travel",
+        "city": "Songkhla",
+        "state": "Thailand",
+        "id": 1008,
+        "isFeatured": false,
+        "isFavorite": false,
+        "coordinates": {
+            "longitude": 100.467,
+            "latitude": 7.017
+        },
+        "description": "Hat Yai, the largest city in southern Thailand, is a bustling commercial hub and popular shopping destination. Known for its vibrant night markets, delicious street food, and friendly atmosphere, the city attracts visitors from neighboring Malaysia and Singapore. The city offers a mix of modern shopping malls, traditional markets, and cultural attractions. Visitors can explore the famous Hat Yai Municipal Park, enjoy local delicacies at the night bazaar, or visit nearby temples and natural attractions. The city's strategic location makes it an ideal base for exploring southern Thailand's beautiful beaches and islands.",
+        "imageName": "hatyai"
+    },
+    {
+        "name": "Singapore",
+        "category": "Travel",
+        "city": "Singapore",
+        "state": "",
+        "id": 1009,
+        "isFeatured": false,
+        "isFavorite": false,
+        "coordinates": {
+            "longitude": 103.851959,
+            "latitude": 1.290270
+        },
+        "description": "Singapore, a modern city-state in Southeast Asia, is known for its impressive skyline, multicultural heritage, and world-class attractions. The city offers a perfect blend of urban sophistication and natural beauty, from the iconic Marina Bay Sands to the lush Gardens by the Bay. Visitors can explore diverse neighborhoods like Chinatown, Little India, and Kampong Glam, each offering unique cultural experiences. The city is also famous for its hawker centers, where visitors can sample delicious local cuisine. With its efficient public transport, clean streets, and numerous attractions, Singapore provides an excellent travel experience for visitors of all interests.",
+        "imageName": "singapore"
+    }
+]

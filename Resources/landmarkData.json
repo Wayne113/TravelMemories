@@ -1,0 +1,98 @@
+[
+    {
+        "name": "Tanjung Aru Beach",
+        "category": "Beaches & Islands",
+        "city": "Kota Kinabalu",
+        "state": "Sabah",
+        "id": 1001,
+        "isFeatured": true,
+        "isFavorite": true,
+        "park": "Tanjung Aru Beach Park",
+        "coordinates": {
+            "longitude": 116.0581,
+            "latitude": 5.9471
+        },
+        "description": "Tanjung Aru Beach is a popular beach in Kota Kinabalu, Sabah, Malaysia. Known for its stunning sunsets, this beach offers a perfect blend of natural beauty and recreational facilities. The beach features a long stretch of golden sand, clear waters, and a beautiful promenade. Visitors can enjoy various activities such as swimming, beach volleyball, and water sports. The nearby Tanjung Aru Beach Park provides amenities including restaurants, cafes, and picnic areas. The beach is particularly famous for its spectacular sunset views, making it a favorite spot for both locals and tourists.",
+        "imageName": "tanjungaru"
+    },
+    {
+        "name": "Mount Kinabalu",
+        "category": "Hiking",
+        "city": "Ranau",
+        "state": "Sabah",
+        "id": 1003,
+        "isFeatured": true,
+        "isFavorite": true,
+        "park": "Kinabalu Park",
+        "coordinates": {
+            "longitude": 116.5581,
+            "latitude": 6.0750
+        },
+        "description": "Mount Kinabalu (4,095m) is Southeast Asia's tallest mountain, located in Kinabalu Park, Sabah, Malaysia. This UNESCO World Heritage Site boasts unparalleled biodiversity (including rare orchids and the giant Rafflesia flower) and is sacred to the Kadazan-Dusun people. The challenging 2-day summit trek rewards climbers with surreal sunrise views from its granite peak. The nearest gateway is Kota Kinabalu (~2 hours away), with the mountain town Kundasang serving as the base for expeditions. A must-visit for adventurers and nature lovers alike!",
+        "imageName": "mountkinabalu"
+    },
+    {
+        "name": "Mount Emei",
+        "category": "Hiking",
+        "city": "Emeishan",
+        "state": "Sichuan",
+        "id": 1006,
+        "isFeatured": false,
+        "isFavorite": false,
+        "park": "Mount Emei Scenic Area",
+        "coordinates": {
+            "longitude": 103.3367,
+            "latitude": 29.5216
+        },
+        "description": "Mount Emei, or Emeishan, is one of China's Four Sacred Buddhist Mountains, located in Sichuan Province. Renowned for its stunning natural beauty, ancient temples, and rich cultural heritage, it attracts pilgrims and hikers alike. The mountain is covered with lush forests, diverse wildlife, and offers breathtaking views, especially at sunrise above the sea of clouds. It's also a UNESCO World Heritage site, celebrated for its spiritual significance and serene landscapes.",
+        "imageName": "emeishan"
+    },
+    {
+        "name": "Sematan Beach",
+        "category": "Beaches & Islands",
+        "city": "Lundu",
+        "state": "Sarawak",
+        "id": 1007,
+        "isFeatured": true,
+        "isFavorite": false,
+        "park": "Sematan Beach Park",
+        "coordinates": {
+            "longitude": 109.7667,
+            "latitude": 1.8167
+        },
+        "description": "Sematan Beach is a hidden gem located in Lundu, Sarawak, Malaysia. This pristine beach is known for its untouched natural beauty, clear waters, and peaceful atmosphere. The beach offers a perfect escape from city life, with its long stretch of white sand and gentle waves. Visitors can enjoy swimming, beachcombing, and watching spectacular sunsets. The surrounding area is rich in biodiversity, with nearby mangrove forests and fishing villages. Sematan Beach is particularly popular among locals for weekend getaways and is becoming increasingly known among tourists seeking unspoiled coastal beauty.",
+        "imageName": "sematanbeach"
+    },
+    {
+        "name": "Penang Hill",
+        "category": "Hiking",
+        "city": "George Town",
+        "state": "Penang",
+        "id": 1008,
+        "isFeatured": false,
+        "isFavorite": false,
+        "park": "Penang Hill",
+        "coordinates": {
+            "longitude": 100.2651,
+            "latitude": 5.3971
+        },
+        "description": "Penang Hill, located near George Town in Malaysia, is a popular getaway known for its cool climate and stunning panoramic views of the island. The hill is covered in lush tropical rainforest and offers a peaceful escape from the city's heat and hustle. Visitors can hike scenic trails or take a funicular railway to the summit, where colonial-era bungalows, cafes, and lookout points await. The area is rich in biodiversity and provides a refreshing experience for nature lovers, hikers, and those seeking a tranquil retreat. Penang Hill is also culturally significant, with temples and heritage sites adding to its charm.",
+        "imageName": "penanghill"
+    },
+    {
+        "name": "Pangkor Island",
+        "category": "Beaches & Islands",
+        "city": "Lumut",
+        "state": "Perak",
+        "id": 1011,
+        "isFeatured": false,
+        "isFavorite": false,
+        "park": "Pangkor Island Marine Park",
+        "coordinates": {
+            "longitude": 100.5581,
+            "latitude": 4.2271
+        },
+        "description": "Pangkor Island is a beautiful island off the coast of Perak, Malaysia, accessible from Lumut. Known for its pristine beaches, crystal-clear waters, and laid-back atmosphere, it's a perfect destination for those seeking a peaceful beach getaway. The island features several stunning beaches, including Nipah Bay and Coral Bay, known for their white sand and excellent snorkeling spots. Visitors can enjoy various activities such as island hopping, fishing, and exploring the local fishing villages. The island is also home to the historic Dutch Fort and offers a mix of luxury resorts and budget accommodations. Pangkor Island is particularly famous for its fresh seafood and traditional fishing village culture.",
+        "imageName": "pangkorisland"
+    }
+] 
