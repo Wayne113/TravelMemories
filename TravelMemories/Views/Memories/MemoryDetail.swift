@@ -29,9 +29,9 @@ struct MemoryDetail: View {
                 }
 
                 HStack {
-                    Text(memory.city)
-                    Spacer()
                     Text(memory.state)
+                    Spacer()
+                    Text(memory.visitedDate ?? "Unknown Date")
                 }
                 .font(.subheadline)
                 .foregroundStyle(.secondary)

@@ -10,6 +10,7 @@ struct Memory: Hashable, Codable, Identifiable {
     var description: String
     var isFavorite: Bool
     var isFeatured: Bool
+    var visitedDate: String?
     
     var category: Category
     enum Category: String, CaseIterable, Codable {
