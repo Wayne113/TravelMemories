@@ -36,7 +36,7 @@ struct TextOverlay: View {
                 Text(memory.name)
                     .font(.title)
                     .bold()
-                Text(memory.city)
+                Text(memory.state.isEmpty ? memory.country : memory.state + ", " + memory.country)
             }
             .padding()
         }

@@ -13,6 +13,8 @@ struct AddMemory: View {
     @State private var visitedDate = Date()
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var image: Image?
+    @State private var isFeatured = false
+    @State private var isFavorite = false
     
     var body: some View {
         NavigationView {
@@ -55,6 +57,11 @@ struct AddMemory: View {
                         }
                     }
                     DatePicker("Visited Date", selection: $visitedDate, displayedComponents: .date)
+                }
+                
+                Section(header: Text("Status")) {
+                    Toggle("Favorite", isOn: $isFavorite)
+                    Toggle("Featured", isOn: $isFeatured)
                 }
             }
             .navigationTitle("Add Memory")

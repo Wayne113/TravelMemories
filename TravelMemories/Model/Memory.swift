@@ -5,7 +5,7 @@ import CoreLocation
 struct Memory: Hashable, Codable, Identifiable {
     var id: Int
     var name: String
-    var city: String
+    var country: String
     var state: String
     var description: String
     var isFavorite: Bool

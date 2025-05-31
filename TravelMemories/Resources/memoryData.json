@@ -2,8 +2,8 @@
     {
         "name": "Tanjung Aru Beach",
         "category": "Beach & Island",
-        "city": "Kota Kinabalu",
         "state": "Sabah",
+        "country": "Malaysia",
         "id": 1001,
         "isFeatured": true,
         "isFavorite": true,
@@ -18,8 +18,8 @@
     {
         "name": "Mount Kinabalu",
         "category": "Hiking",
-        "city": "Ranau",
         "state": "Sabah",
+        "country": "Malaysia",
         "id": 1002,
         "isFeatured": true,
         "isFavorite": true,
@@ -34,8 +34,8 @@
     {
         "name": "Mount Emei",
         "category": "Hiking",
-        "city": "Emeishan",
         "state": "Sichuan",
+        "country": "China",
         "id": 1003,
         "isFeatured": false,
         "isFavorite": false,
@@ -50,8 +50,8 @@
     {
         "name": "Sematan Beach",
         "category": "Beach & Island",
-        "city": "Lundu",
         "state": "Sarawak",
+        "country": "Malaysia",
         "id": 1004,
         "isFeatured": true,
         "isFavorite": false,
@@ -65,8 +65,8 @@
     {
         "name": "Penang Hill",
         "category": "Hiking",
-        "city": "George Town",
         "state": "Penang",
+        "country": "Malaysia",
         "id": 1005,
         "isFeatured": false,
         "isFavorite": false,
@@ -81,8 +81,8 @@
     {
         "name": "Pangkor Island",
         "category": "Beach & Island",
-        "city": "Lumut",
         "state": "Perak",
+        "country": "Malaysia",
         "id": 1006,
         "isFeatured": false,
         "isFavorite": false,
@@ -97,8 +97,8 @@
     {
         "name": "Chengdu",
         "category": "Travel",
-        "city": "Sichuan",
-        "state": "China",
+        "state": "",
+        "country": "China",
         "id": 1007,
         "isFeatured": true,
         "isFavorite": false,
@@ -113,8 +113,8 @@
     {
         "name": "Hat Yai",
         "category": "Travel",
-        "city": "Songkhla",
-        "state": "Thailand",
+        "state": "Songkhla",
+        "country": "Thailand",
         "id": 1008,
         "isFeatured": false,
         "isFavorite": false,
@@ -129,8 +129,8 @@
     {
         "name": "Singapore",
         "category": "Travel",
-        "city": "Singapore",
-        "state": "Singapore",
+        "state": "",
+        "country": "Singapore",
         "id": 1009,
         "isFeatured": false,
         "isFavorite": false,

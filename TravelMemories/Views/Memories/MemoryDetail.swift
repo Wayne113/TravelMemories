@@ -29,7 +29,7 @@ struct MemoryDetail: View {
                 }
 
                 HStack {
-                    Text(memory.state)
+                    Text(memory.state.isEmpty ? memory.country : memory.state + ", " + memory.country)
                     Spacer()
                     Text(memory.visitedDate ?? "Unknown Date")
                 }
@@ -52,6 +52,6 @@ struct MemoryDetail: View {
 
 #Preview {
     let modelData = ModelData()
-    return MemoryDetail(memory: modelData.memories[8])
+    return MemoryDetail(memory: modelData.memories[1])
         .environment(modelData)
 }
