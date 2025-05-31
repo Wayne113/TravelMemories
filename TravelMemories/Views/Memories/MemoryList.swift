@@ -32,6 +32,15 @@ struct MemoryList: View {
                     } label: {
                         MemoryRow(memory: memory)
                     }
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            if let index = modelData.memories.firstIndex(where: { $0.id == memory.id }) {
+                                modelData.memories.remove(at: index)
+                            }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
                 }
             }
             .animation(.default, value: filteredMemories)

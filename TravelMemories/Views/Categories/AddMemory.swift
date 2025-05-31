@@ -1,12 +1,25 @@
 import SwiftUI
 import PhotosUI
+import MapKit
+
+class SearchCompleterDelegate: NSObject, MKLocalSearchCompleterDelegate {
+    var onResultsUpdate: (([MKLocalSearchCompletion]) -> Void)?
+
+    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        onResultsUpdate?(completer.results)
+    }
+
+    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
+        onResultsUpdate?([])
+    }
+}
 
 struct AddMemory: View {
     @Environment(ModelData.self) var modelData
     @Environment(\.dismiss) var dismiss
     
     @State private var name = ""
-    @State private var city = ""
+    @State private var country = ""
     @State private var state = ""
     @State private var description = ""
     @State private var category: Memory.Category = .beachIsland
@@ -15,6 +28,13 @@ struct AddMemory: View {
     @State private var image: Image?
     @State private var isFeatured = false
     @State private var isFavorite = false
+    
+    // Location search states
+    @State private var searchResults: [MKLocalSearchCompletion] = []
+    @State private var searchCompleter = MKLocalSearchCompleter()
+    private var searchCompleterDelegate = SearchCompleterDelegate()
+    @State private var isSearching = false
+    @State private var ignoreNameChange = false
     
     var body: some View {
         NavigationView {
@@ -48,8 +68,38 @@ struct AddMemory: View {
                 
                 Section(header: Text("Details")) {
                     TextField("Name", text: $name)
-                    TextField("City", text: $city)
+                        .onChange(of: name) { _, newValue in
+                            if ignoreNameChange {
+                                ignoreNameChange = false
+                                return
+                            }
+                            if !newValue.isEmpty {
+                                searchCompleter.queryFragment = newValue
+                                isSearching = true
+                            } else {
+                                searchResults = []
+                                isSearching = false
+                            }
+                        }
+                    
+                    if isSearching && !searchResults.isEmpty {
+                        ForEach(searchResults, id: \.self) { result in
+                            Button(action: {
+                                selectLocation(result)
+                            }) {
+                                VStack(alignment: .leading) {
+                                    Text(result.title)
+                                        .foregroundColor(.primary)
+                                    Text(result.subtitle)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        }
+                    }
+                    
                     TextField("State", text: $state)
+                    TextField("Country", text: $country)
                     TextField("Description", text: $description)
                     Picker("Category", selection: $category) {
                         ForEach(Memory.Category.allCases, id: \.self) { cat in
@@ -86,6 +136,35 @@ struct AddMemory: View {
                         image = Image(uiImage: uiImage)
                     }
                 }
+            }
+        }
+        .onAppear {
+            searchCompleter.delegate = searchCompleterDelegate
+            searchCompleterDelegate.onResultsUpdate = { results in
+                self.searchResults = results
+            }
+        }
+    }
+    
+    private func selectLocation(_ result: MKLocalSearchCompletion) {
+        // Clear search results and hide suggestions first
+        searchResults = []
+        isSearching = false
+
+        let searchRequest = MKLocalSearch.Request(completion: result)
+        let search = MKLocalSearch(request: searchRequest)
+
+        search.start { response, error in
+            guard let response = response, error == nil else { return }
+
+            if let item = response.mapItems.first {
+                let placemark = item.placemark
+
+                // Prevent onChange from firing
+                ignoreNameChange = true
+                name = result.title
+                state = placemark.administrativeArea ?? ""
+                country = placemark.country ?? ""
             }
         }
     }
