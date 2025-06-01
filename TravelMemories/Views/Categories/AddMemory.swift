@@ -147,9 +147,12 @@ struct AddMemory: View {
     }
     
     private func selectLocation(_ result: MKLocalSearchCompletion) {
-        // Clear search results and hide suggestions first
-        searchResults = []
-        isSearching = false
+        //after location selection, the search bar dismissed
+        DispatchQueue.main.async {
+            self.searchResults = []
+            self.isSearching = false
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
 
         let searchRequest = MKLocalSearch.Request(completion: result)
         let search = MKLocalSearch(request: searchRequest)
