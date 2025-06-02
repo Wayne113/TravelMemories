@@ -20,8 +20,17 @@ struct Memory: Hashable, Codable, Identifiable {
     }
 
     private var imageName: String
+    var imagePath: String?
+    
     var image: Image {
-        Image(imageName)
+        if let imagePath = imagePath,
+           let uiImage = UIImage(contentsOfFile: imagePath) {
+            return Image(uiImage: uiImage)
+        } else if UIImage(named: imageName) != nil {
+            return Image(imageName)
+        } else {
+            return Image(systemName: "photo") // fallback system image
+        }
     }
 
     private var coordinates: Coordinates
@@ -34,5 +43,21 @@ struct Memory: Hashable, Codable, Identifiable {
     struct Coordinates: Hashable, Codable {
         var latitude: Double
         var longitude: Double
+    }
+
+    // Custom initializer to allow creating new Memory instances
+    init(id: Int, name: String, country: String, state: String, description: String, isFavorite: Bool, isFeatured: Bool, visitedDate: String?, category: Category, imageName: String, coordinates: Coordinates, imagePath: String? = nil) {
+        self.id = id
+        self.name = name
+        self.country = country
+        self.state = state
+        self.description = description
+        self.isFavorite = isFavorite
+        self.isFeatured = isFeatured
+        self.visitedDate = visitedDate
+        self.category = category
+        self.imageName = imageName
+        self.coordinates = coordinates
+        self.imagePath = imagePath
     }
 }

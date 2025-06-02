@@ -5,6 +5,8 @@ struct CircleImage: View {
 
     var body: some View {
         image
+            .resizable()
+            .scaledToFill()
             .clipShape(Circle())
             .overlay {
                 Circle().stroke(.white, lineWidth: 4)

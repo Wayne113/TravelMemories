@@ -17,8 +17,9 @@ struct MemoryDetail: View {
                 .frame(height: 300)
 
             CircleImage(image: memory.image)
-                .offset(y: -130)
-                .padding(.bottom, -130)
+                .frame(width: 200, height: 200)
+                .offset(y: -100)
+                .padding(.bottom, -100)
 
             VStack(alignment: .leading) {
                 HStack {

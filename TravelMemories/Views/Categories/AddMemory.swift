@@ -35,6 +35,8 @@ struct AddMemory: View {
     private var searchCompleterDelegate = SearchCompleterDelegate()
     @State private var isSearching = false
     @State private var ignoreNameChange = false
+    @State private var coordinates: Memory.Coordinates?
+    @State private var savedImagePath: String?
     
     var body: some View {
         NavigationView {
@@ -122,7 +124,7 @@ struct AddMemory: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(action: {
-                        // Add your logic to save the new memory here!
+                        saveMemory()
                         dismiss()
                     }) {
                         Image(systemName: "checkmark")
@@ -133,7 +135,16 @@ struct AddMemory: View {
                 Task {
                     if let data = try? await newValue?.loadTransferable(type: Data.self),
                        let uiImage = UIImage(data: data) {
-                        image = Image(uiImage: uiImage)
+                        let squared = cropToSquare(image: uiImage)
+                        let displaySize: CGFloat = 200
+                        let scale = UIScreen.main.scale
+                        let scaledSize = displaySize * scale
+                        let resized = resizeImage(squared, targetSize: CGSize(width: scaledSize, height: scaledSize))
+                        image = Image(uiImage: resized)
+                        // Save image to disk
+                        if let path = saveImageToDocuments(uiImage: resized) {
+                            savedImagePath = path
+                        }
                     }
                 }
             }
@@ -144,6 +155,29 @@ struct AddMemory: View {
                 self.searchResults = results
             }
         }
+    }
+    
+    private func saveMemory() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .long
+        let formattedDate = dateFormatter.string(from: visitedDate)
+        
+        let newMemory = Memory(
+            id: modelData.memories.count + 1000, // Generate a new ID
+            name: name,
+            country: country,
+            state: state,
+            description: description,
+            isFavorite: isFavorite,
+            isFeatured: isFeatured,
+            visitedDate: formattedDate,
+            category: category,
+            imageName: "placeholder", // fallback asset
+            coordinates: coordinates ?? Memory.Coordinates(latitude: 0, longitude: 0),
+            imagePath: savedImagePath // use the saved path
+        )
+        
+        modelData.memories.append(newMemory)
     }
     
     private func selectLocation(_ result: MKLocalSearchCompletion) {
@@ -168,8 +202,50 @@ struct AddMemory: View {
                 name = result.title
                 state = placemark.administrativeArea ?? ""
                 country = placemark.country ?? ""
+                
+                // Save coordinates
+                coordinates = Memory.Coordinates(
+                    latitude: placemark.coordinate.latitude,
+                    longitude: placemark.coordinate.longitude
+                )
             }
         }
+    }
+    
+    // Helper to save image to disk
+    private func saveImageToDocuments(uiImage: UIImage) -> String? {
+        guard let data = uiImage.jpegData(compressionQuality: 0.8) else { return nil }
+        let filename = UUID().uuidString + ".jpg"
+        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(filename)
+        do {
+            try data.write(to: url)
+            return url.path
+        } catch {
+            print("Error saving image: \(error)")
+            return nil
+        }
+    }
+    
+    // Helper to resize image to a target size
+    private func resizeImage(_ image: UIImage, targetSize: CGSize) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
+        return renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: targetSize))
+        }
+    }
+    
+    // Helper to crop image to a square
+    private func cropToSquare(image: UIImage) -> UIImage {
+        let originalWidth  = image.size.width
+        let originalHeight = image.size.height
+        let edge = min(originalWidth, originalHeight)
+        let posX = (originalWidth  - edge) / 2.0
+        let posY = (originalHeight - edge) / 2.0
+        let cropSquare = CGRect(x: posX, y: posY, width: edge, height: edge)
+        if let cgImage = image.cgImage?.cropping(to: cropSquare) {
+            return UIImage(cgImage: cgImage, scale: image.scale, orientation: image.imageOrientation)
+        }
+        return image
     }
 }
 
