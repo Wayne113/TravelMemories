@@ -3,10 +3,11 @@ import SwiftUI
 
 struct MemoryDetail: View {
     @Environment(ModelData.self) var modelData
+    @Environment(\.dismiss) var dismiss
     var memory: Memory
     
-    var memoryIndex: Int {
-        modelData.memories.firstIndex(where: { $0.id == memory.id })!
+    var memoryIndex: Int? {
+        modelData.memories.firstIndex(where: { $0.id == memory.id })
     }
     
     var body: some View {
@@ -26,7 +27,9 @@ struct MemoryDetail: View {
                     Text(memory.name)
                         .font(.title)
                     Spacer()
-                    FavoriteButton(isSet: $modelData.memories[memoryIndex].isFavorite)
+                    if let index = memoryIndex {
+                        FavoriteButton(isSet: $modelData.memories[index].isFavorite)
+                    }
                 }
 
                 HStack {
@@ -45,12 +48,28 @@ struct MemoryDetail: View {
                 Text(memory.description)
             }
             .padding()
-            .onChange(of: modelData.memories[memoryIndex].isFavorite) { oldValue, newValue in
-                saveMemories(memories: modelData.memories)
+            .onChange(of: memory.isFavorite) { oldValue, newValue in
+                if memoryIndex != nil {
+                    saveMemories(memories: modelData.memories)
+                    print("Memory favorite status changed for \(memory.name), saved memories from detail view.")
+                }
             }
         }
         .navigationTitle(memory.name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(role: .destructive) {
+                    if let index = memoryIndex {
+                        modelData.memories.remove(at: index)
+                        saveMemories(memories: modelData.memories)
+                        dismiss()
+                    }
+                } label: {
+                    Label("Delete Memory", systemImage: "trash")
+                }
+            }
+        }
     }
 }
 
