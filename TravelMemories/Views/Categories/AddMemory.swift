@@ -163,7 +163,7 @@ struct AddMemory: View {
         let formattedDate = dateFormatter.string(from: visitedDate)
         
         let newMemory = Memory(
-            id: modelData.memories.count + 1000, // Generate a new ID
+            id: UUID().hashValue,
             name: name,
             country: country,
             state: state,
@@ -172,9 +172,9 @@ struct AddMemory: View {
             isFeatured: isFeatured,
             visitedDate: formattedDate,
             category: category,
-            imageName: "placeholder", // fallback asset
+            imageName: savedImagePath != nil ? "" : "placeholder",
             coordinates: coordinates ?? Memory.Coordinates(latitude: 0, longitude: 0),
-            imagePath: savedImagePath // use the saved path
+            imagePath: savedImagePath
         )
         
         modelData.memories.append(newMemory)

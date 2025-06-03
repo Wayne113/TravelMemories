@@ -17,6 +17,16 @@ struct MemoryList: View {
         modelData.memories.filter { memory in
             (!showFavoritesOnly || memory.isFavorite)
         }
+        .sorted { memory1, memory2 in
+            // Sort favorites first
+            if memory1.isFavorite && !memory2.isFavorite {
+                return true // memory1 (favorite) comes before memory2 (not favorite)
+            } else if !memory1.isFavorite && memory2.isFavorite {
+                return false // memory2 (favorite) comes before memory1 (not favorite)
+            } else {
+                return false // Maintain original order for memories with the same favorite status
+            }
+        }
     }
 
     var body: some View {
@@ -36,6 +46,7 @@ struct MemoryList: View {
                         Button(role: .destructive) {
                             if let index = modelData.memories.firstIndex(where: { $0.id == memory.id }) {
                                 modelData.memories.remove(at: index)
+                                saveMemories(memories: modelData.memories)
                             }
                         } label: {
                             Label("Delete", systemImage: "trash")

@@ -45,6 +45,9 @@ struct MemoryDetail: View {
                 Text(memory.description)
             }
             .padding()
+            .onChange(of: modelData.memories[memoryIndex].isFavorite) { oldValue, newValue in
+                saveMemories(memories: modelData.memories)
+            }
         }
         .navigationTitle(memory.name)
         .navigationBarTitleDisplayMode(.inline)
