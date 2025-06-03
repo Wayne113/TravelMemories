@@ -178,6 +178,7 @@ struct AddMemory: View {
         )
         
         modelData.memories.append(newMemory)
+        saveMemories(memories: modelData.memories)
     }
     
     private func selectLocation(_ result: MKLocalSearchCompletion) {
