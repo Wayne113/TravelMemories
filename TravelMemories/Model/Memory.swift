@@ -45,8 +45,11 @@ struct Memory: Hashable, Codable, Identifiable {
         var longitude: Double
     }
 
+    var imageNames: [String]?
+    var userImagePaths: [String]?
+
     // Custom initializer to allow creating new Memory instances
-    init(id: Int, name: String, country: String, state: String, description: String, isFavorite: Bool, isFeatured: Bool, visitedDate: String?, category: Category, imageName: String, coordinates: Coordinates, imagePath: String? = nil) {
+    init(id: Int, name: String, country: String, state: String, description: String, isFavorite: Bool, isFeatured: Bool, visitedDate: String?, category: Category, imageName: String, coordinates: Coordinates, imagePath: String? = nil, imageNames: [String]? = nil, userImagePaths: [String]? = nil) {
         self.id = id
         self.name = name
         self.country = country
@@ -59,5 +62,7 @@ struct Memory: Hashable, Codable, Identifiable {
         self.imageName = imageName
         self.coordinates = coordinates
         self.imagePath = imagePath
+        self.imageNames = imageNames
+        self.userImagePaths = userImagePaths
     }
 }

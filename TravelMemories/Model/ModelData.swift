@@ -15,6 +15,12 @@ class ModelData {
             by: { $0.category.rawValue }
         )
     }
+
+    func saveProfile() {
+        if let encoded = try? JSONEncoder().encode(profile) {
+            UserDefaults.standard.set(encoded, forKey: "userProfile")
+        }
+    }
 }
 
 func loadMemories() -> [Memory] {
