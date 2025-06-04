@@ -40,18 +40,6 @@ struct ProfileEditor: View {
                 }
                 PhotosPicker("Upload Photo", selection: $selectedPhoto, matching: .images)
                     .padding(.top, 8)
-                Button("Remove Photo") {
-                    if let fileName = profile.profileImageFileName {
-                        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(fileName)
-                        try? FileManager.default.removeItem(at: url)
-                    }
-                    profile.profileImageFileName = nil
-                    profileUIImage = nil
-                    selectedPhoto = nil
-                }
-                .foregroundColor(.red)
-                .padding(.top, 5)
-                .padding(.bottom, 5)
             }
             .frame(maxWidth: .infinity, alignment: .center)
             .listRowInsets(EdgeInsets())
