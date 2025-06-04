@@ -88,22 +88,22 @@ struct MemoryDetail: View {
                         }
                     }
                     .onChange(of: selectedItems) { oldItems, newItems in
-                        selectedImages = []
-                        var newPaths: [String] = []
+                        selectedImages = Array(repeating: UIImage(), count: newItems.count)
+                        var newPaths: [String?] = Array(repeating: nil, count: newItems.count)
                         for (index, item) in newItems.enumerated() {
                             item.loadTransferable(type: Data.self) { result in
                                 switch result {
                                 case .success(let data):
                                     if let data, let uiImage = UIImage(data: data) {
                                         DispatchQueue.main.async {
-                                            selectedImages.append(uiImage)
+                                            selectedImages[index] = uiImage
                                             // Save to disk
                                             let fileName = "memory_\(memory.id)_userphoto_\(index)_\(UUID().uuidString).jpg"
                                             if let path = saveImageToDocuments(uiImage, fileName: fileName) {
-                                                newPaths.append(path)
-                                                // When all images are processed, update the model
-                                                if newPaths.count == newItems.count, let memoryIndex = memoryIndex {
-                                                    modelData.memories[memoryIndex].userImagePaths = newPaths
+                                                newPaths[index] = path
+                                                // 检查是否全部完成
+                                                if newPaths.allSatisfy({ $0 != nil }), let memoryIndex = memoryIndex {
+                                                    modelData.memories[memoryIndex].userImagePaths = newPaths.compactMap { $0 }
                                                     saveMemories(memories: modelData.memories)
                                                 }
                                             }
