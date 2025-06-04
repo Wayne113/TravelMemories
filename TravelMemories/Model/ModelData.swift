@@ -3,7 +3,11 @@ import Foundation
 @Observable
 class ModelData {
     var memories: [Memory] = loadMemories()
-    var profile = Profile.default
+    var profile: Profile
+    
+    init() {
+        self.profile = ModelData.loadProfile()
+    }
     
     var features: [Memory] {
         memories.filter { $0.isFeatured }
@@ -20,6 +24,14 @@ class ModelData {
         if let encoded = try? JSONEncoder().encode(profile) {
             UserDefaults.standard.set(encoded, forKey: "userProfile")
         }
+    }
+    
+    static func loadProfile() -> Profile {
+        if let data = UserDefaults.standard.data(forKey: "userProfile"),
+           let profile = try? JSONDecoder().decode(Profile.self, from: data) {
+            return profile
+        }
+        return Profile.default
     }
 }
 

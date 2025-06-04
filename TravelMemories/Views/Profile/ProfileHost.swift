@@ -32,6 +32,7 @@ struct ProfileHost: View {
                     }
                     .onDisappear {
                         modelData.profile = draftProfile
+                        modelData.saveProfile()
                     }
             }
         }
