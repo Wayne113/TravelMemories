@@ -1,12 +1,3 @@
-/*
-See the LICENSE.txt file for this sample's licensing information.
-
-Abstract:
-A view showing a list of memories.
-
-This view displays a list of travel memories that can be filtered and favorited.
-*/
-
 import SwiftUI
 
 struct MemoryList: View {

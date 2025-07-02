@@ -1,12 +1,3 @@
-/*
-See the LICENSE.txt file for this sample's licensing information.
-
-Abstract:
-A single row to be displayed in a list of memories.
-
-This view shows a single memory in a list format.
-*/
-
 import SwiftUI
 
 struct MemoryRow: View {

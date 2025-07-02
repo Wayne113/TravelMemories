@@ -101,7 +101,7 @@ struct MemoryDetail: View {
                                             let fileName = "memory_\(memory.id)_userphoto_\(index)_\(UUID().uuidString).jpg"
                                             if let path = saveImageToDocuments(uiImage, fileName: fileName) {
                                                 newPaths[index] = path
-                                                // 检查是否全部完成
+                                                // Check if all completed
                                                 if newPaths.allSatisfy({ $0 != nil }), let memoryIndex = memoryIndex {
                                                     modelData.memories[memoryIndex].userImagePaths = newPaths.compactMap { $0 }
                                                     saveMemories(memories: modelData.memories)
@@ -193,7 +193,7 @@ struct MemoryDetail: View {
         .environment(modelData)
 }
 
-// Add these helpers at the top level (outside the struct)
+// Add these helpers at the top level
 func saveImageToDocuments(_ image: UIImage, fileName: String) -> String? {
     guard let data = image.jpegData(compressionQuality: 0.9) else { return nil }
     let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
