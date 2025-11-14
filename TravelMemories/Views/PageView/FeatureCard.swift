@@ -8,14 +8,21 @@ import SwiftUI
 
 struct FeatureCard: View {
     var memory: Memory
-    
+
     var body: some View {
-        memory.image
-            .resizable()
-            .aspectRatio(3 / 2, contentMode: .fit)
-            .overlay {
-                TextOverlay(memory: memory)
+        Group {
+            if memory.isFromFirebase, let imageURL = memory.firstImageURL {
+                FirebaseImageView(imageURL: imageURL, placeholder: memory.image)
+                    .aspectRatio(3 / 2, contentMode: .fit)
+            } else {
+                memory.image
+                    .resizable()
+                    .aspectRatio(3 / 2, contentMode: .fit)
             }
+        }
+        .overlay {
+            TextOverlay(memory: memory)
+        }
     }
 }
 

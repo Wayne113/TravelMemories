@@ -5,13 +5,19 @@ struct MemoryRow: View {
 
     var body: some View {
         HStack {
-            memory.image
-                .resizable()
-                .frame(width: 50, height: 50)
+            if memory.isFromFirebase, let imageURL = memory.firstImageURL {
+                FirebaseImageView(imageURL: imageURL, placeholder: memory.image)
+                    .frame(width: 50, height: 50)
+                    .clipShape(RoundedRectangle(cornerRadius: 5))
+            } else {
+                memory.image
+                    .resizable()
+                    .frame(width: 50, height: 50)
+            }
             Text(memory.name)
 
             Spacer()
-            
+
             if memory.isFavorite {
                 Image(systemName: "star.fill")
                     .foregroundStyle(.yellow)

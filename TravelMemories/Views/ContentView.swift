@@ -1,12 +1,3 @@
-/*
-See the LICENSE.txt file for this sample's licensing information.
-
-Abstract:
-A view showing the list of memories.
-
-This view displays the main list of travel memories.
-*/
-
 import SwiftUI
 
 /// A view showing the list of memories.

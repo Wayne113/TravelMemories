@@ -2,14 +2,20 @@ import SwiftUI
 
 struct CategoryItem: View {
     var memory: Memory
-    
+
     var body: some View {
         VStack(alignment: .leading) {
-            memory.image
-                .renderingMode(.original)
-                .resizable()
-                .frame(width: 155, height: 155)
-                .cornerRadius(5)
+            if memory.isFromFirebase, let imageURL = memory.firstImageURL {
+                FirebaseImageView(imageURL: imageURL, placeholder: memory.image)
+                    .frame(width: 155, height: 155)
+                    .cornerRadius(5)
+            } else {
+                memory.image
+                    .renderingMode(.original)
+                    .resizable()
+                    .frame(width: 155, height: 155)
+                    .cornerRadius(5)
+            }
             Text(memory.name)
                 .foregroundStyle(.primary)
                 .font(.caption)

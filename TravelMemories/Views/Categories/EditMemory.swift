@@ -2,32 +2,22 @@ import SwiftUI
 import PhotosUI
 import MapKit
 
-class SearchCompleterDelegate: NSObject, MKLocalSearchCompleterDelegate {
-    var onResultsUpdate: (([MKLocalSearchCompletion]) -> Void)?
-
-    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-        onResultsUpdate?(completer.results)
-    }
-
-    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
-        onResultsUpdate?([])
-    }
-}
-
-struct AddMemory: View {
+struct EditMemory: View {
     @Environment(ModelData.self) var modelData
     @Environment(\.dismiss) var dismiss
     
-    @State private var name = ""
-    @State private var country = ""
-    @State private var state = ""
-    @State private var description = ""
-    @State private var category: Memory.Category = .beachIsland
-    @State private var visitedDate = Date()
+    var memory: Memory
+    
+    @State private var name: String
+    @State private var country: String
+    @State private var state: String
+    @State private var description: String
+    @State private var category: Memory.Category
+    @State private var visitedDate: Date
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var image: Image?
-    @State private var isFeatured = false
-    @State private var isFavorite = false
+    @State private var isFeatured: Bool
+    @State private var isFavorite: Bool
     
     // Location search states
     @State private var searchResults: [MKLocalSearchCompletion] = []
@@ -35,10 +25,39 @@ struct AddMemory: View {
     private var searchCompleterDelegate = SearchCompleterDelegate()
     @State private var isSearching = false
     @State private var ignoreNameChange = false
-    @State private var coordinates: Memory.Coordinates?
+    @State private var coordinates: Memory.Coordinates
     @State private var savedImagePath: String?
     @State private var savedUIImage: UIImage? // Store UIImage for Firebase upload
     @State private var isSaving = false // Track saving state
+    @State private var existingFirebaseImages: [UIImage] = [] // Store existing Firebase images
+    @State private var isLoadingImages = false
+    
+    init(memory: Memory) {
+        self.memory = memory
+        
+        // Initialize state with existing memory data
+        _name = State(initialValue: memory.name)
+        _country = State(initialValue: memory.country)
+        _state = State(initialValue: memory.state)
+        _description = State(initialValue: memory.description)
+        _category = State(initialValue: memory.category)
+        _isFeatured = State(initialValue: memory.isFeatured)
+        _isFavorite = State(initialValue: memory.isFavorite)
+        _coordinates = State(initialValue: Memory.Coordinates(
+            latitude: memory.locationCoordinate.latitude,
+            longitude: memory.locationCoordinate.longitude
+        ))
+        
+        // Parse visited date
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .long
+        if let visitedDateString = memory.visitedDate,
+           let date = dateFormatter.date(from: visitedDateString) {
+            _visitedDate = State(initialValue: date)
+        } else {
+            _visitedDate = State(initialValue: Date())
+        }
+    }
     
     var body: some View {
         NavigationView {
@@ -48,6 +67,19 @@ struct AddMemory: View {
                     VStack {
                         if let image = image {
                             image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 120, height: 120)
+                                .clipShape(Circle())
+                        } else if !existingFirebaseImages.isEmpty {
+                            Image(uiImage: existingFirebaseImages[0])
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 120, height: 120)
+                                .clipShape(Circle())
+                        } else if let imagePath = memory.imagePath,
+                                  let uiImage = UIImage(contentsOfFile: imagePath) {
+                            Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 120, height: 120)
@@ -62,7 +94,7 @@ struct AddMemory: View {
                                         .foregroundColor(.gray)
                                 )
                         }
-                        PhotosPicker("Choose Photo", selection: $selectedPhoto, matching: .images)
+                        PhotosPicker("Change Photo", selection: $selectedPhoto, matching: .images)
                             .padding(.top, 8)
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -118,7 +150,7 @@ struct AddMemory: View {
                     Toggle("Featured", isOn: $isFeatured)
                 }
             }
-            .navigationTitle("Add Memory")
+            .navigationTitle("Edit Memory")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -127,7 +159,7 @@ struct AddMemory: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(action: {
                         Task {
-                            await saveMemory()
+                            await updateMemory()
                             await MainActor.run {
                                 dismiss()
                             }
@@ -141,6 +173,13 @@ struct AddMemory: View {
                     }
                     .disabled(isSaving)
                 }
+            }
+            .onAppear {
+                searchCompleter.delegate = searchCompleterDelegate
+                searchCompleterDelegate.onResultsUpdate = { results in
+                    self.searchResults = results
+                }
+                loadExistingImages()
             }
             .onChange(of: selectedPhoto) { _, newValue in
                 Task {
@@ -162,15 +201,45 @@ struct AddMemory: View {
                 }
             }
         }
-        .onAppear {
-            searchCompleter.delegate = searchCompleterDelegate
-            searchCompleterDelegate.onResultsUpdate = { results in
-                self.searchResults = results
+    }
+    
+    private func loadExistingImages() {
+        isLoadingImages = true
+        Task {
+            // Load Firebase images if available
+            if memory.isFromFirebase, let imageURLs = memory.imageNames {
+                var loadedImages: [UIImage] = []
+                for imageURL in imageURLs {
+                    if let url = URL(string: imageURL) {
+                        do {
+                            let (data, _) = try await URLSession.shared.data(from: url)
+                            if let uiImage = UIImage(data: data) {
+                                loadedImages.append(uiImage)
+                            }
+                        } catch {
+                            print("Error loading Firebase image: \(error)")
+                        }
+                    }
+                }
+                await MainActor.run {
+                    existingFirebaseImages = loadedImages
+                    isLoadingImages = false
+                }
+            } else if let imagePath = memory.imagePath,
+                      let uiImage = UIImage(contentsOfFile: imagePath) {
+                await MainActor.run {
+                    existingFirebaseImages = [uiImage]
+                    isLoadingImages = false
+                }
+            } else {
+                await MainActor.run {
+                    isLoadingImages = false
+                }
             }
         }
     }
     
-    private func saveMemory() async {
+    private func updateMemory() async {
         isSaving = true
         defer { isSaving = false }
         
@@ -178,8 +247,10 @@ struct AddMemory: View {
         dateFormatter.dateStyle = .long
         let formattedDate = dateFormatter.string(from: visitedDate)
         
-        let newMemory = Memory(
-            id: UUID().hashValue,
+        // Create updated memory with new values
+        // Note: imageName is private, so we use empty string (not used for Firebase memories)
+        let updatedMemory = Memory(
+            id: memory.id,
             name: name,
             country: country,
             state: state,
@@ -188,31 +259,47 @@ struct AddMemory: View {
             isFeatured: isFeatured,
             visitedDate: formattedDate,
             category: category,
-            imageName: savedImagePath != nil ? "" : "placeholder",
-            coordinates: coordinates ?? Memory.Coordinates(latitude: 0, longitude: 0),
-            imagePath: savedImagePath
+            imageName: "", // Not used for Firebase memories
+            coordinates: coordinates,
+            imagePath: savedImagePath ?? memory.imagePath,
+            imageNames: memory.imageNames,
+            userImagePaths: memory.userImagePaths,
+            firestoreDocumentId: memory.firestoreDocumentId,
+            isFromFirebase: memory.isFromFirebase
         )
         
         // Prepare images for Firebase upload
-        var imagesToUpload: [UIImage] = []
+        var imagesToUpload: [UIImage]? = nil
         if let savedUIImage = savedUIImage {
-            imagesToUpload.append(savedUIImage)
+            // User selected a new photo, use it
+            imagesToUpload = [savedUIImage]
+        } else if !existingFirebaseImages.isEmpty {
+            // Keep existing images (no new image selected)
+            imagesToUpload = nil // nil means keep existing
         }
         
         do {
-            // Save to Firebase
-            try await modelData.addMemory(newMemory, images: imagesToUpload)
-            
-            // Also save locally as backup
-            await MainActor.run {
-                saveMemories(memories: modelData.memories)
+            // Update in Firebase if it's a Firebase memory
+            // This will also update the local array with the new imageNames
+            if updatedMemory.isFromFirebase, updatedMemory.firestoreDocumentId != nil {
+                try await modelData.updateMemory(updatedMemory, newImages: imagesToUpload)
+            } else {
+                // For non-Firebase memories, just update locally
+                await MainActor.run {
+                    if let index = modelData.memories.firstIndex(where: { $0.id == memory.id }) {
+                        modelData.memories[index] = updatedMemory
+                        saveMemories(memories: modelData.memories)
+                    }
+                }
             }
         } catch {
-            print("Error saving memory to Firebase: \(error)")
-            // Still save locally even if Firebase fails
+            print("Error updating memory in Firebase: \(error)")
+            // Still update locally even if Firebase fails
             await MainActor.run {
-                modelData.memories.append(newMemory)
-                saveMemories(memories: modelData.memories)
+                if let index = modelData.memories.firstIndex(where: { $0.id == memory.id }) {
+                    modelData.memories[index] = updatedMemory
+                    saveMemories(memories: modelData.memories)
+                }
             }
         }
     }
@@ -287,6 +374,8 @@ struct AddMemory: View {
 }
 
 #Preview {
-    AddMemory()
-        .environment(ModelData())
+    let modelData = ModelData()
+    EditMemory(memory: modelData.memories[0])
+        .environment(modelData)
 }
+

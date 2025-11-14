@@ -8,28 +8,54 @@ struct MemoryDetail: View {
     
     @State private var selectedItems: [PhotosPickerItem] = []
     @State private var selectedImages: [UIImage] = []
+    @State private var firebaseImages: [UIImage] = [] // Store loaded Firebase images
     @State private var showPhotoPreview = false
     @State private var selectedPhotoIndex = 0
+    @State private var isLoadingFirebaseImages = false
+    @State private var showEditMemory = false
     
     var memoryIndex: Int? {
         modelData.memories.firstIndex(where: { $0.id == memory.id })
     }
     
+    // Get current memory from modelData to reflect updates
+    var currentMemory: Memory? {
+        modelData.memories.first(where: { $0.id == memory.id })
+    }
+    
     var body: some View {
         @Bindable var modelData = modelData
         
+        // Use current memory if available, otherwise use initial memory
+        let displayMemory = currentMemory ?? memory
+        
         ScrollView {
-            MapView(memory: memory)
+            MapView(memory: displayMemory)
                 .frame(height: 300)
 
-            CircleImage(image: memory.image)
-                .frame(width: 200, height: 200)
-                .offset(y: -100)
-                .padding(.bottom, -100)
+            Group {
+                if displayMemory.isFromFirebase, let imageURL = displayMemory.firstImageURL {
+                    FirebaseImageView(imageURL: imageURL, placeholder: displayMemory.image)
+                        .frame(width: 200, height: 200)
+                        .scaledToFill()
+                        .clipShape(Circle())
+                        .overlay {
+                            Circle().stroke(.white, lineWidth: 4)
+                        }
+                        .shadow(radius: 7)
+                        .offset(y: -100)
+                        .padding(.bottom, -100)
+                } else {
+                    CircleImage(image: displayMemory.image)
+                        .frame(width: 200, height: 200)
+                        .offset(y: -100)
+                        .padding(.bottom, -100)
+                }
+            }
 
             VStack(alignment: .leading) {
                 HStack {
-                    Text(memory.name)
+                    Text(displayMemory.name)
                         .font(.title)
                     Spacer()
                     if let index = memoryIndex {
@@ -38,28 +64,43 @@ struct MemoryDetail: View {
                 }
 
                 HStack {
-                    Text(memory.state.isEmpty ? memory.country : memory.state + ", " + memory.country)
+                    Text(displayMemory.state.isEmpty ? displayMemory.country : displayMemory.state + ", " + displayMemory.country)
                     Spacer()
-                    Text(memory.visitedDate ?? "Unknown Date")
+                    Text(displayMemory.visitedDate ?? "Unknown Date")
                 }
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
                 Divider()
 
-                Text("About \(memory.name)")
+                Text("About \(displayMemory.name)")
                     .font(.title2)
                 Spacer()
-                Text(memory.description)
+                Text(displayMemory.description)
 
                 Divider()
                 Text("Photos")
                     .font(.title2)
 
-                // Grid layout for selected images and '+' button
+                // Grid layout for all images (Firebase + user-added) and '+' button
                 let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
                 LazyVGrid(columns: columns, spacing: 8) {
-                    // Show selected images
+                    // Show Firebase images first
+                    ForEach(firebaseImages.indices, id: \.self) { idx in
+                        Image(uiImage: firebaseImages[idx])
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 100, height: 100)
+                            .clipped()
+                            .cornerRadius(8)
+                            .onTapGesture {
+                                // Firebase images come first, so index is just idx
+                                selectedPhotoIndex = idx
+                                showPhotoPreview = true
+                            }
+                    }
+                    
+                    // Show user-added images
                     ForEach(selectedImages.indices, id: \.self) { idx in
                         Image(uiImage: selectedImages[idx])
                             .resizable()
@@ -68,11 +109,13 @@ struct MemoryDetail: View {
                             .clipped()
                             .cornerRadius(8)
                             .onTapGesture {
-                                selectedPhotoIndex = idx
+                                // User images come after Firebase images
+                                selectedPhotoIndex = firebaseImages.count + idx
                                 showPhotoPreview = true
                             }
                     }
-                    // '+' button as grid item
+                    
+                    // '+' button as grid item (only show if not a Firebase-only memory or allow adding more)
                     PhotosPicker(
                         selection: $selectedItems,
                         matching: .images,
@@ -119,58 +162,97 @@ struct MemoryDetail: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical)
                 .onAppear {
-                    if let paths = memory.userImagePaths {
+                    // Load user-added images
+                    if let paths = displayMemory.userImagePaths {
                         selectedImages = paths.compactMap { loadImageFromDocuments(path: $0) }
                     }
-                }
-
-                // Existing code for imageNames if you want to keep it
-                if let imageNames = memory.imageNames, !imageNames.isEmpty {
-                    VStack(alignment: .leading) {
-                        Text("More Photos")
-                            .font(.title2)
-                            .padding(.top)
-
-                        ForEach(imageNames, id: \.self) {
-                            imageName in
-                            Image(imageName)
-                                .resizable()
-                                .scaledToFit()
-                                .cornerRadius(10)
-                                .padding(.bottom, 5)
-                        }
-                    }
+                    
+                    // Load Firebase images
+                    loadFirebaseImages()
                 }
             }
             .padding()
-            .onChange(of: memory.isFavorite) { oldValue, newValue in
+            .onChange(of: displayMemory.isFavorite) { oldValue, newValue in
                 if memoryIndex != nil {
                     saveMemories(memories: modelData.memories)
-                    print("Memory favorite status changed for \(memory.name), saved memories from detail view.")
+                    print("Memory favorite status changed for \(displayMemory.name), saved memories from detail view.")
                 }
             }
         }
-        .navigationTitle(memory.name)
+        .navigationTitle(displayMemory.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(role: .destructive) {
-                    if let index = memoryIndex {
-                        modelData.memories.remove(at: index)
-                        saveMemories(memories: modelData.memories)
-                        dismiss()
+                HStack {
+                    Button {
+                        showEditMemory = true
+                    } label: {
+                        Label("Edit Memory", systemImage: "pencil")
                     }
-                } label: {
-                    Label("Delete Memory", systemImage: "trash")
+                    
+                    Button(role: .destructive) {
+                        Task {
+                            do {
+                                // deleteMemory handles Firebase deletion if needed
+                                try await modelData.deleteMemory(displayMemory)
+                                await MainActor.run {
+                                    dismiss()
+                                }
+                            } catch {
+                                print("Error deleting memory: \(error)")
+                                // Still remove from local array and dismiss even if Firebase delete fails
+                                await MainActor.run {
+                                    if let index = memoryIndex {
+                                        modelData.memories.remove(at: index)
+                                        saveMemories(memories: modelData.memories)
+                                    }
+                                    dismiss()
+                                }
+                            }
+                        }
+                    } label: {
+                        Label("Delete Memory", systemImage: "trash")
+                    }
                 }
             }
         }
+        .sheet(isPresented: $showEditMemory) {
+            if let currentMemory = currentMemory {
+                EditMemory(memory: currentMemory)
+                    .environment(modelData)
+            } else {
+                EditMemory(memory: memory)
+                    .environment(modelData)
+            }
+        }
+        .onChange(of: showEditMemory) { _, isPresented in
+            if !isPresented {
+                // Reload images when edit sheet is dismissed
+                loadFirebaseImages()
+            }
+        }
+        .onChange(of: displayMemory.firstImageURL) { _, _ in
+            // Reload images when image URL changes
+            loadFirebaseImages()
+        }
         .sheet(isPresented: $showPhotoPreview) {
-            if selectedImages.indices.contains(selectedPhotoIndex) {
+            // Combine Firebase images and user images for preview
+            let allImages = firebaseImages + selectedImages
+            if allImages.indices.contains(selectedPhotoIndex) {
                 PhotoPreviewModal(
-                    images: $selectedImages,
+                    images: Binding(
+                        get: { firebaseImages + selectedImages },
+                        set: { newImages in
+                            // Split back into Firebase and user images
+                            let firebaseCount = firebaseImages.count
+                            if newImages.count >= firebaseCount {
+                                firebaseImages = Array(newImages.prefix(firebaseCount))
+                                selectedImages = Array(newImages.suffix(from: firebaseCount))
+                            }
+                        }
+                    ),
                     imagePaths: Binding(
-                        get: { memory.userImagePaths ?? [] },
+                        get: { displayMemory.userImagePaths ?? [] },
                         set: { newPaths in
                             if let memoryIndex = memoryIndex {
                                 modelData.memories[memoryIndex].userImagePaths = newPaths
@@ -180,8 +262,40 @@ struct MemoryDetail: View {
                     ),
                     selectedIndex: $selectedPhotoIndex,
                     isPresented: $showPhotoPreview,
-                    selectedItems: $selectedItems
+                    selectedItems: $selectedItems,
+                    firebaseImageCount: firebaseImages.count
                 )
+            }
+        }
+    }
+    
+    // Load Firebase images into the firebaseImages array
+    private func loadFirebaseImages() {
+        let displayMemory = currentMemory ?? memory
+        guard let imageURLs = displayMemory.imageNames, !imageURLs.isEmpty else {
+            return
+        }
+        
+        isLoadingFirebaseImages = true
+        Task {
+            var loadedImages: [UIImage] = []
+            
+            for imageURL in imageURLs {
+                if let url = URL(string: imageURL) {
+                    do {
+                        let (data, _) = try await URLSession.shared.data(from: url)
+                        if let uiImage = UIImage(data: data) {
+                            loadedImages.append(uiImage)
+                        }
+                    } catch {
+                        print("Error loading Firebase image: \(error)")
+                    }
+                }
+            }
+            
+            await MainActor.run {
+                firebaseImages = loadedImages
+                isLoadingFirebaseImages = false
             }
         }
     }
@@ -217,12 +331,18 @@ struct PhotoPreviewModal: View {
     @Binding var selectedIndex: Int
     @Binding var isPresented: Bool
     @Binding var selectedItems: [PhotosPickerItem]
+    var firebaseImageCount: Int = 0 // Number of Firebase images (non-deletable)
     @State private var isZoomed: Bool = false
     @State private var dragOffset: CGFloat = 0.0
     @State private var scale: CGFloat = 1.0
     @State private var lastScale: CGFloat = 1.0
     @State private var offset: CGSize = .zero
     @State private var lastOffset: CGSize = .zero
+    
+    // Check if current image is a Firebase image (non-deletable)
+    private var isFirebaseImage: Bool {
+        selectedIndex < firebaseImageCount
+    }
 
     var body: some View {
         VStack {
@@ -247,13 +367,15 @@ struct PhotoPreviewModal: View {
                         .font(.title2)
                 }
                 Button(action: {
-                    if images.indices.contains(selectedIndex) {
+                    // Only allow deleting user-added images, not Firebase images
+                    if !isFirebaseImage && images.indices.contains(selectedIndex) {
+                        let userImageIndex = selectedIndex - firebaseImageCount
                         images.remove(at: selectedIndex)
-                        if imagePaths.indices.contains(selectedIndex) {
-                            imagePaths.remove(at: selectedIndex)
+                        if imagePaths.indices.contains(userImageIndex) {
+                            imagePaths.remove(at: userImageIndex)
                         }
-                        if selectedItems.indices.contains(selectedIndex) {
-                            selectedItems.remove(at: selectedIndex)
+                        if selectedItems.indices.contains(userImageIndex) {
+                            selectedItems.remove(at: userImageIndex)
                         }
                         if images.isEmpty {
                             isPresented = false
@@ -263,9 +385,10 @@ struct PhotoPreviewModal: View {
                     }
                 }) {
                     Image(systemName: "trash")
-                        .foregroundColor(.red)
+                        .foregroundColor(isFirebaseImage ? .gray : .red)
                         .font(.title2)
                 }
+                .disabled(isFirebaseImage)
             }
             .padding()
             Spacer()

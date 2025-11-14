@@ -25,9 +25,20 @@ struct MemoryList: View {
                     }
                     .swipeActions(edge: .trailing) {
                         Button(role: .destructive) {
-                            if let index = modelData.memories.firstIndex(where: { $0.id == memory.id }) {
-                                modelData.memories.remove(at: index)
-                                saveMemories(memories: modelData.memories)
+                            Task {
+                                do {
+                                    // deleteMemory handles Firebase deletion if needed
+                                    try await modelData.deleteMemory(memory)
+                                } catch {
+                                    print("Error deleting memory: \(error)")
+                                    // Still remove from local array even if Firebase delete fails
+                                    await MainActor.run {
+                                        if let index = modelData.memories.firstIndex(where: { $0.id == memory.id }) {
+                                            modelData.memories.remove(at: index)
+                                            saveMemories(memories: modelData.memories)
+                                        }
+                                    }
+                                }
                             }
                         } label: {
                             Label("Delete", systemImage: "trash")
